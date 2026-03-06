@@ -20,9 +20,8 @@ WORKDIR /root/
 
 # Copy binary
 COPY --from=builder /app/app .
-
-
 COPY --from=builder /app/static ./static
+COPY --from=builder /app/k8s ./k8s
 
 EXPOSE 9000
 
