@@ -12,16 +12,21 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app .
 
 
 # ---------- Runtime Stage ----------
-FROM alpine:latest
+FROM alpine:3.20
 
 RUN apk add --no-cache ca-certificates
 
-WORKDIR /root/
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
 
 # Copy binary
 COPY --from=builder /app/app .
 COPY --from=builder /app/static ./static
-COPY --from=builder /app/k8s ./k8s
+
+RUN chown -R appuser:appgroup /app
+
+USER appuser
 
 EXPOSE 9000
 
