@@ -20,12 +20,20 @@ pipeline {
       }
     }
 
-    stage('Push Image') {
-      steps {
-        sh 'docker login -u likhith04* -p ********'
-        sh 'docker push likhith045/go-web-app:$BUILD_NUMBER'
-      }
+    stage('Push image') {
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: 'docker-creds',
+            usernameVariable: 'USER',
+            passwordVariable: 'PASS'
+        )]) {
+            sh '''
+            echo $PASS | docker login -u $USER --password-stdin
+            docker push $IMAGE:$BUILD_NUMBER
+            '''
+        }
     }
+}
     
     stage('Deploy to k8s') {
       steps {
